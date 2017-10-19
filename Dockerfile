@@ -38,4 +38,8 @@ COPY ./zz-fpm.conf /usr/local/etc/php-fpm.d/
 COPY xdebug.sh /
 RUN mv /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini.bak
 
-USER www-data
+# Tools to change the uid on run
+RUN echo http://dl-2.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
+    apk add --no-cache shadow
+COPY entrypoint-chuid /usr/local/bin
+ENTRYPOINT ["entrypoint-chuid"]

@@ -1,0 +1,9 @@
+#!/bin/sh
+# Change UID to the one from user
+set -e
+
+usermod -u $UID www-data
+groupmod -g $GID www-data
+
+# Call parent entrypoint
+exec "$@"
