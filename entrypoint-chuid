@@ -2,8 +2,13 @@
 # Change UID to the one from user
 set -e
 
-usermod -u $UID www-data
-groupmod -g $GID www-data
+if [ `id -u www-data` != ${UID} ]; then
+	usermod -u ${UID} www-data
+fi
+if [ `id -g www-data` != ${GID} ]; then
+	groupmod -g ${GID} www-data
+fi
 
 # Call parent entrypoint
-exec "$@"
+echo "$@"
+exec docker-php-entrypoint "$@"
