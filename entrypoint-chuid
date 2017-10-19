@@ -10,5 +10,4 @@ if [ `id -g www-data` != ${GID} ]; then
 fi
 
 # Call parent entrypoint
-echo "$@"
 exec docker-php-entrypoint "$@"
