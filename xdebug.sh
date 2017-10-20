@@ -38,3 +38,6 @@ case $1 in
     fi
     ;;
 esac
+
+# Tell php-fpm to reload config
+pkill -USR2 php-fpm
