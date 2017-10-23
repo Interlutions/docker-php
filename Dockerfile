@@ -39,7 +39,7 @@ COPY xdebug.sh /
 RUN mv /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini.bak
 
 # Tools to change the uid on run
-RUN echo http://dl-2.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
+RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
     apk add --no-cache shadow
 COPY entrypoint-chuid /usr/local/bin
 ENTRYPOINT ["entrypoint-chuid"]
