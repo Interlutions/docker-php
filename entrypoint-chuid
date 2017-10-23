@@ -2,11 +2,14 @@
 # Change UID to the one from user
 set -e
 
-if [ `id -u www-data` != ${UID} ]; then
-	usermod -u ${UID} www-data
-fi
-if [ `id -g www-data` != ${GID} ]; then
-	groupmod -g ${GID} www-data
+# Change id only if we are root and the id really differs
+if [ `whoami` == "root" ]; then
+	if [ `id -u www-data` != ${UID} ]; then
+		usermod -u ${UID} www-data
+	fi
+	if [ `id -g www-data` != ${GID} ]; then
+		groupmod -g ${GID} www-data
+	fi
 fi
 
 # Call parent entrypoint
