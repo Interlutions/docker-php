@@ -2,15 +2,21 @@
 # Change UID to the one from user
 set -e
 
-# Change id only if we are root and the id really differs
-if [ "`whoami`" == "root" ]; then
-	if [ `id -u www-data` != ${UID} ]; then
-		usermod -u ${UID} www-data
-	fi
-	if [ `id -g www-data` != ${GID} ]; then
-		groupmod -g ${GID} www-data
-	fi
+# Change uid of the user.
+# NOTE: You cannot change the uid of the running process, so this must happen as root. Use -e USERSPACE=1 instead of --user=www-data at docker-compose
+if [ `id -u www-data` != ${UID} ]; then
+	usermod -u ${UID} www-data
+fi
+if [ `id -g www-data` != ${GID} ]; then
+	groupmod -g ${GID} www-data
 fi
 
-# Call parent entrypoint
-exec docker-php-entrypoint "$@"
+# Call parent entrypoint (as other user) when needed
+if [ ! -z ${USERSPACE} ]; then
+	# Downgrade to www-data
+	su-exec www-data docker-php-entrypoint "$@"
+else
+	# Run as same user (root)
+	exec docker-php-entrypoint "$@"
+fi
+
