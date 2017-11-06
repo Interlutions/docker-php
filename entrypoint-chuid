@@ -14,7 +14,7 @@ fi
 # Call parent entrypoint (as other user) when needed
 if [ ! -z ${USERSPACE} ]; then
 	# Downgrade to www-data
-	su-exec www-data docker-php-entrypoint "$@"
+	sudo -u www-data docker-php-entrypoint "$@"
 else
 	# Run as same user (root)
 	exec docker-php-entrypoint "$@"

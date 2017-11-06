@@ -1,46 +1,102 @@
-FROM php:7.0-fpm-alpine
+FROM php:7.0-fpm
 
-# Install PHP extensions
-RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS && \
-    apk add --no-cache --virtual .gd-runtime-deps freetype libpng libjpeg-turbo && \
-    apk add --no-cache --virtual .gd-build-deps freetype-dev libpng-dev libjpeg-turbo-dev && \
-    apk add --no-cache --virtual .ext-runtime-deps libbz2 libmcrypt libxslt icu && \
-    apk add --no-cache --virtual .ext-build-deps bzip2-dev libmcrypt-dev libxml2-dev libedit-dev libxslt-dev icu-dev sqlite-dev && \
+# Add some native php extensions
+RUN apt-get update &&\
+    apt-get install -y --no-install-recommends \
+        icu-devtools libbsd-dev libbz2-dev libedit-dev libfreetype6 libfreetype6-dev \
+        libicu-dev libicu52 libjpeg62-turbo libjpeg62-turbo-dev libmcrypt-dev \
+        libmcrypt4 libpng12-0 libpng12-dev libsqlite3-dev libtinfo-dev libxml2-dev \
+        libxslt1-dev libxslt1.1 zlib1g-dev \
+    && \
+    rm -r /var/lib/apt/lists/* && \
     docker-php-ext-configure gd \
-      --with-freetype-dir=/usr/include/ \
-      --with-png-dir=/usr/include/ \
-      --with-jpeg-dir=/usr/include/ && \
-    NPROC=$(getconf _NPROCESSORS_ONLN) && \
-    docker-php-ext-install -j${NPROC} bz2 dom exif fileinfo hash iconv mcrypt intl opcache pcntl pdo pdo_mysql pdo_sqlite readline session simplexml xml xsl zip gd && \
-    pecl install xdebug-2.5.0 && \
-    docker-php-ext-enable xdebug && \
+        --with-freetype-dir=/usr/include/ \
+        --with-png-dir=/usr/include/ \
+        --with-jpeg-dir=/usr/include/ \
+    && \
+    docker-php-ext-install -j$(nproc) \
+        bz2 \
+        dom \
+        exif \
+        fileinfo \
+        hash \
+        iconv \
+        mcrypt \
+        intl \
+        opcache \
+        pcntl \
+        pdo \
+        pdo_mysql \
+        pdo_sqlite \
+        readline \
+        session \
+        simplexml \
+        xml \
+        xsl \
+        zip \
+        gd \
+    && \
+    apt-get purge -y \
+        icu-devtools libbsd-dev libbz2-dev libedit-dev libfreetype6-dev \
+        libicu-dev libjpeg62-turbo-dev libmcrypt-dev \
+        libpng12-dev libsqlite3-dev libtinfo-dev libxml2-dev \
+        libxslt1-dev zlib1g-dev
+
+# APCu
+RUN docker-php-source extract && \
     pecl install apcu && \
     docker-php-ext-enable apcu && \
-    apk del .gd-build-deps && \
-    apk del .build-deps && \
-    apk del .ext-build-deps && \
-    rm -r /tmp/*
+    docker-php-source delete
 
-# download composer as fallback if non is provided
+# ioncube loader
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends wget && \
+    wget https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz && \
+    tar xfz ioncube_loaders_lin_x86-64.tar.gz && \
+    cp ioncube/ioncube_loader_lin_7.0.so $(php -r 'echo ini_get("extension_dir");') && \
+    echo "zend_extension=ioncube_loader_lin_7.0.so" > /usr/local/etc/php/conf.d/00-ioncube.ini && \
+    rm -Rf ioncube_loaders_lin_x86-64.tar.gz ioncube && \
+    apt-get remove -y wget && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Enable mailing via ssmtp
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ssmtp && \
+	apt-get clean && \
+	rm -r /var/lib/apt/lists/*
+ADD mail.ini /usr/local/etc/php/conf.d/mail.ini
+
+# Download composer as fallback if non is provided
 RUN curl -o /usr/local/bin/composer.phar http://getcomposer.org/composer.phar && \
-    chmod +x /usr/local/bin/composer.phar && \
-    ln -s /usr/local/bin/composer.phar /usr/local/bin/composer
+  chmod +x /usr/local/bin/composer.phar && \
+  ln -s /usr/local/bin/composer.phar /usr/local/bin/composer
 
 # Install git+ssh (for composer install)
-RUN apk add --no-cache git openssh-client rsync
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git openssh-client rsync && \
+	apt-get clean && \
+	rm -r /var/lib/apt/lists/*
 
 # Default configuration for fpm
-# Project-specific ini can be added with COPY ./php-ini-overrides.ini /usr/local/etc/php/conf.d/
 COPY ./zz-fpm.conf /usr/local/etc/php-fpm.d/
 
 # Disable xdebug by default and add a script to reactivate
 # Just add a COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini.bak in your project
+RUN docker-php-source extract && \
+    pecl install xdebug-2.5.0 && \
+    docker-php-ext-enable xdebug && \
+    docker-php-source delete
 COPY xdebug.sh /
 RUN mv /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini.bak
 
 # Tools to change the uid on run
-RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
-    apk add --no-cache shadow su-exec
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends sudo && \
+	apt-get clean && \
+	rm -r /var/lib/apt/lists/*
+
 COPY entrypoint-chuid /usr/local/bin
 ENTRYPOINT ["entrypoint-chuid"]
 CMD ["php-fpm"]
