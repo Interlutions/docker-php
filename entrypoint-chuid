@@ -6,9 +6,11 @@ set -e
 # NOTE: You cannot change the uid of the running process, so this must happen as root. Use -e USERSPACE=1 instead of --user=www-data at docker-compose
 if [ `id -u www-data` != ${UID} ]; then
 	usermod -u ${UID} www-data
+	chown -R www-data /var/www
 fi
 if [ `id -g www-data` != ${GID} ]; then
 	groupmod -g ${GID} www-data
+	chgrp -R www-data /var/www
 fi
 
 # Call parent entrypoint (as other user) when needed
