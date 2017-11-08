@@ -22,4 +22,3 @@ else
 	# Run as same user (root)
 	exec docker-php-entrypoint "$@"
 fi
-
