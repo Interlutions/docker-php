@@ -1,24 +1,26 @@
 #!/bin/sh
 # Change UID to the one from user
+# NOTE: You cannot change the uid of the running process, so this must happen as root. Use -e USERSPACE=1 instead of --user=www-data at docker-compose
 set -e
+USERNAME="www-data"
+GROUPNAME=${USERNAME}
 
 # Change uid of the user.
 # NOTE: You cannot change the uid of the running process, so this must happen as root. Use -e USERSPACE=1 instead of --user=www-data at docker-compose
-if [ `id -u www-data` != ${UID} ]; then
-	usermod -u ${UID} www-data
-	chown -R www-data /var/www
+if [ `id -u ${USERNAME}` != ${UID} ]; then
+	usermod -u ${UID} ${USERNAME}
+	chown -R ${USERNAME} /var/www
 fi
-if [ `id -g www-data` != ${GID} ]; then
-	groupmod -g ${GID} www-data
-	chgrp -R www-data /var/www
+if [ `id -g ${GROUPNAME}` != ${GID} ]; then
+	groupmod -g ${GID} ${GROUPNAME}
+	chgrp -R ${GROUPNAME} /var/www
 fi
 
 # Call parent entrypoint (as other user) when needed
 if [ ! -z ${USERSPACE} ]; then
-	# Downgrade to www-data
-	sudo -u www-data docker-php-entrypoint "$@"
+	# Downgrade to ${USERNAME}
+	sudo -u ${USERNAME} docker-php-entrypoint "$@"
 else
 	# Run as same user (root)
 	exec docker-php-entrypoint "$@"
 fi
-
