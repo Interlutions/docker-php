@@ -29,6 +29,9 @@ RUN curl -o /usr/local/bin/composer.phar http://getcomposer.org/composer.phar &&
 # Install git+ssh (for composer install)
 RUN apk add --no-cache git openssh-client rsync
 
+# Install mysql clinet (for data-transfer operations)
+RUN apk add --no-cache mysql-client
+
 # Default configuration for fpm
 # Project-specific ini can be added with COPY ./php-ini-overrides.ini /usr/local/etc/php/conf.d/
 COPY ./zz-fpm.conf /usr/local/etc/php-fpm.d/
