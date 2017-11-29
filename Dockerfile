@@ -64,20 +64,26 @@ RUN apt-get update && \
 # Enable mailing via ssmtp
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ssmtp && \
-	apt-get clean && \
-	rm -r /var/lib/apt/lists/*
+    apt-get clean && \
+    rm -r /var/lib/apt/lists/*
 ADD mail.ini /usr/local/etc/php/conf.d/mail.ini
 
 # Download composer as fallback if non is provided
 RUN curl -o /usr/local/bin/composer.phar http://getcomposer.org/composer.phar && \
-  chmod +x /usr/local/bin/composer.phar && \
-  ln -s /usr/local/bin/composer.phar /usr/local/bin/composer
+    chmod +x /usr/local/bin/composer.phar && \
+    ln -s /usr/local/bin/composer.phar /usr/local/bin/composer
 
 # Install git+ssh (for composer install)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends git openssh-client rsync && \
-	apt-get clean && \
-	rm -r /var/lib/apt/lists/*
+    apt-get clean && \
+    rm -r /var/lib/apt/lists/*
+
+# Install crontab
+RUN apt-get update &&\
+    apt-get install -y --no-install-recommends cron &&\
+    apt-get clean && \
+    rm -r /var/lib/apt/lists/*
 
 # Default configuration for fpm
 COPY ./zz-fpm.conf /usr/local/etc/php-fpm.d/
