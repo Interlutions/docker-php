@@ -79,11 +79,27 @@ RUN apt-get update && \
     apt-get clean && \
     rm -r /var/lib/apt/lists/*
 
-# Install crontab
-RUN apt-get update &&\
-    apt-get install -y --no-install-recommends cron &&\
+# Install and configure fcron
+RUN groupadd -r -g 109 fcron && \
+    useradd -u 109 -r fcron -g fcron && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends wget vim && \
+    wget http://fcron.free.fr/archives/fcron-3.3.0.src.tar.gz && \
+    tar xfz fcron-3.3.0.src.tar.gz  && \
+    cd fcron-3.3.0  && \
+    ./configure  && \
+    make && \
+    make install && \
+    apt-get purge -y wget vim && \
+    apt-get autoremove -y && \
     apt-get clean && \
-    rm -r /var/lib/apt/lists/*
+    rm -Rf fcron-3.3.0*z && \
+    rm -rf /var/lib/apt/lists/
+ADD fcron.conf /usr/local/etc
+ADD echomail /usr/local/bin
+RUN chown root:fcron /usr/local/etc/fcron.conf && \
+    chmod 644 /usr/local/etc/fcron.conf
+
 
 # Default configuration for fpm
 COPY ./zz-fpm.conf /usr/local/etc/php-fpm.d/
@@ -103,6 +119,7 @@ RUN apt-get update && \
 	apt-get clean && \
 	rm -r /var/lib/apt/lists/*
 
+COPY entrypoint-cron /usr/local/bin
 COPY entrypoint-chuid /usr/local/bin
 ENTRYPOINT ["entrypoint-chuid"]
 CMD ["php-fpm"]
