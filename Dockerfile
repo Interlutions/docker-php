@@ -15,7 +15,8 @@ RUN apt-get update &&\
         --with-jpeg-dir=/usr/include/ \
     && \
     docker-php-ext-install -j$(nproc) \
-        bz2 \
+        bcmath \
+	bz2 \
         dom \
         exif \
         fileinfo \
