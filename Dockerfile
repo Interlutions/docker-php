@@ -101,7 +101,6 @@ ADD echomail /usr/local/bin
 RUN chown root:fcron /usr/local/etc/fcron.conf && \
     chmod 644 /usr/local/etc/fcron.conf
 
-
 # Default configuration for fpm
 COPY ./zz-fpm.conf /usr/local/etc/php-fpm.d/
 
@@ -119,6 +118,9 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends sudo && \
 	apt-get clean && \
 	rm -r /var/lib/apt/lists/*
+
+# Cache composer downloads in a volume
+VOLUME /var/www/.composer
 
 COPY entrypoint-cron /usr/local/bin
 COPY entrypoint-chuid /usr/local/bin
