@@ -44,6 +44,9 @@ COPY ./zz-fpm.conf /usr/local/etc/php-fpm.d/
 COPY xdebug.sh /
 RUN mv /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini.bak
 
+# Cache composer downloads in a volume
+VOLUME /var/www/.composer
+
 # Tools to change the uid on run
 RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
     apk add --no-cache shadow su-exec
