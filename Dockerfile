@@ -50,8 +50,7 @@ RUN groupadd -r -g 109 fcron && \
     make && \
     make install && \
     apk del .build-deps && \
-    rm -Rf fcron-3.3.0*z && \
-    rm -r /tmp/*
+    rm -Rf fcron-3.3.0*z
 ADD fcron.conf /usr/local/etc
 ADD echomail /usr/local/bin
 RUN chown root:fcron /usr/local/etc/fcron.conf && \
