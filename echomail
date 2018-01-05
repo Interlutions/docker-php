@@ -1,0 +1,14 @@
+#!/bin/bash
+# This is a replacement for sendmail that simply outputs the content
+
+# Only show the payload, not the headers
+FLAG=""
+while IFS= read LINE; do
+    if [ ${FLAG} ]; then
+        echo "${LINE}"
+    elif [ "${LINE:0:1}" == $'' ]; then
+        FLAG=true
+    fi
+done
+
+/bin/true

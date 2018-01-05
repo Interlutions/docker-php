@@ -35,6 +35,25 @@ RUN apk add --no-cache mysql-client
 # Install timezone change utils
 RUN apk add --no-cache tzdata
 
+# Install and configure fcron
+RUN groupadd -r -g 109 fcron && \
+    useradd -u 109 -r fcron -g fcron && \
+    apk add --no-cache --virtual .build-deps g++ make perl && \
+    wget http://fcron.free.fr/archives/fcron-3.3.0.src.tar.gz && \
+    tar xfz fcron-3.3.0.src.tar.gz  && \
+    cd fcron-3.3.0  && \
+    ./configure && \
+    make && \
+    make install && \
+    apk del .build-deps && \
+    rm -Rf fcron-3.3.0*z && \
+    rm -r /tmp/*
+ADD fcron.conf /usr/local/etc
+ADD echomail /usr/local/bin
+RUN chown root:fcron /usr/local/etc/fcron.conf && \
+    chmod 644 /usr/local/etc/fcron.conf
+
+
 # Default configuration for fpm
 # Project-specific ini can be added with COPY ./php-ini-overrides.ini /usr/local/etc/php/conf.d/
 COPY ./zz-fpm.conf /usr/local/etc/php-fpm.d/
