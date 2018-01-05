@@ -1,0 +1,7 @@
+#!/bin/sh
+entrypoint-chuid
+
+# Install mounted crontab as www-data user
+fcrontab -u www-data /project/cron/crontab
+
+$@
