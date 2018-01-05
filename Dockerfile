@@ -35,6 +35,10 @@ RUN apk add --no-cache mysql-client
 # Install timezone change utils
 RUN apk add --no-cache tzdata
 
+# Tools to change the uid on run
+RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
+    apk add --no-cache shadow su-exec
+
 # Install and configure fcron
 RUN groupadd -r -g 109 fcron && \
     useradd -u 109 -r fcron -g fcron && \
@@ -53,7 +57,6 @@ ADD echomail /usr/local/bin
 RUN chown root:fcron /usr/local/etc/fcron.conf && \
     chmod 644 /usr/local/etc/fcron.conf
 
-
 # Default configuration for fpm
 # Project-specific ini can be added with COPY ./php-ini-overrides.ini /usr/local/etc/php/conf.d/
 COPY ./zz-fpm.conf /usr/local/etc/php-fpm.d/
@@ -66,9 +69,6 @@ RUN mv /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/co
 # Cache composer downloads in a volume
 VOLUME /var/www/.composer
 
-# Tools to change the uid on run
-RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
-    apk add --no-cache shadow su-exec
 COPY entrypoint-chuid /usr/local/bin
 ENTRYPOINT ["entrypoint-chuid"]
 CMD ["php-fpm"]
