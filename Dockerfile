@@ -122,6 +122,9 @@ RUN apt-get update && \
 # Cache composer downloads in a volume
 VOLUME /var/www/.composer
 
+# Script to wait for db
+COPY wait-for /usr/local/bin
+
 COPY entrypoint-cron /usr/local/bin
 COPY entrypoint-chuid /usr/local/bin
 ENTRYPOINT ["entrypoint-chuid"]
