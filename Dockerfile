@@ -68,6 +68,9 @@ RUN mv /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/co
 # Cache composer downloads in a volume
 VOLUME /var/www/.composer
 
+# Script to wait for db
+COPY wait-for /usr/local/bin
+
 COPY entrypoint-cron /usr/local/bin
 COPY entrypoint-chuid /usr/local/bin
 ENTRYPOINT ["entrypoint-chuid"]
