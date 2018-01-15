@@ -123,6 +123,10 @@ RUN apt-get update && \
 VOLUME /var/www/.composer
 
 # Script to wait for db
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends netcat && \
+    apt-get clean && \
+    rm -r /var/lib/apt/lists/*
 COPY wait-for /usr/local/bin
 
 COPY entrypoint-cron /usr/local/bin
