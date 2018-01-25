@@ -21,10 +21,11 @@ RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS && \
     apk del .ext-build-deps && \
     rm -r /tmp/*
 
-# download composer as fallback if non is provided
-RUN curl -o /usr/local/bin/composer.phar http://getcomposer.org/composer.phar && \
-    chmod +x /usr/local/bin/composer.phar && \
-    ln -s /usr/local/bin/composer.phar /usr/local/bin/composer
+# download composerin the latest stable release
+RUN curl -o composer-installer.php https://getcomposer.org/installer && \
+    php composer-installer.php --quiet --install-dir="/usr/local/bin" && \
+    ln -s /usr/local/bin/composer.phar /usr/local/bin/composer && \
+    rm composer-installer.php
 
 # Install git+ssh (for composer install)
 RUN apk add --no-cache git openssh-client rsync
