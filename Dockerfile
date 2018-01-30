@@ -104,6 +104,9 @@ RUN chown root:fcron /usr/local/etc/fcron.conf && \
 # Default configuration for fpm
 COPY ./zz-fpm.conf /usr/local/etc/php-fpm.d/
 
+# Base php ini
+COPY ./docker-base.ini /usr/local/etc/php/conf.d/
+
 # Disable xdebug by default and add a script to reactivate
 # Just add a COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini.bak in your project
 RUN docker-php-source extract && \
