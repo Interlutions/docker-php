@@ -1,4 +1,4 @@
-FROM php:7.0-fpm
+FROM php:7.1-fpm
 
 # Add some native php extensions
 RUN apt-get update &&\
@@ -54,8 +54,8 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends wget && \
     wget https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz && \
     tar xfz ioncube_loaders_lin_x86-64.tar.gz && \
-    cp ioncube/ioncube_loader_lin_7.0.so $(php -r 'echo ini_get("extension_dir");') && \
-    echo "zend_extension=ioncube_loader_lin_7.0.so" > /usr/local/etc/php/conf.d/00-ioncube.ini && \
+    cp ioncube/ioncube_loader_lin_7.1.so $(php -r 'echo ini_get("extension_dir");') && \
+    echo "zend_extension=ioncube_loader_lin_7.1.so" > /usr/local/etc/php/conf.d/00-ioncube.ini && \
     rm -Rf ioncube_loaders_lin_x86-64.tar.gz ioncube && \
     apt-get remove -y wget && \
     apt-get autoremove -y && \
@@ -110,7 +110,7 @@ COPY ./docker-base.ini /usr/local/etc/php/conf.d/
 # Disable xdebug by default and add a script to reactivate
 # Just add a COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini.bak in your project
 RUN docker-php-source extract && \
-    pecl install xdebug-2.5.0 && \
+    pecl install xdebug && \
     docker-php-ext-enable xdebug && \
     docker-php-source delete
 COPY xdebug.sh /
