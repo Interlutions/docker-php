@@ -20,8 +20,14 @@ RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS && \
     apk del .build-deps && \
     apk del .ext-build-deps && \
     rm -r /tmp/*
+    
+# Install Imagemagick
+RUN apk add --no-cache imagemagick-dev libtool autoconf gcc g++ make \
+    && pecl install imagick-3.4.3 \
+    && echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini \
+    && apk del libtool autoconf gcc g++ make
 
-# download composerin the latest stable release
+# download composer in the latest stable release
 RUN curl -o composer-installer.php https://getcomposer.org/installer && \
     php composer-installer.php --quiet --install-dir="/usr/local/bin" && \
     ln -s /usr/local/bin/composer.phar /usr/local/bin/composer && \
