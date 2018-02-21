@@ -20,7 +20,7 @@ RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS && \
     apk del .build-deps && \
     apk del .ext-build-deps && \
     rm -r /tmp/*
-    
+
 # Install Imagemagick
 RUN apk add --no-cache imagemagick-dev libtool autoconf gcc g++ make \
     && pecl install imagick-3.4.3 \
@@ -41,6 +41,9 @@ RUN apk add --no-cache mysql-client
 
 # Install timezone change utils
 RUN apk add --no-cache tzdata
+
+# Install PHP extension mysqli
+RUN docker-php-ext-install mysqli
 
 # Tools to change the uid on run
 RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
