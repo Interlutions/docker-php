@@ -1,4 +1,4 @@
-# PHP 7.1 fpm alpine for TYPO3 projects
+# PHP 7.1 fpm alpine for Neos projects
 
 This image features
 * Useful PHP extensions
