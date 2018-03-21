@@ -36,6 +36,7 @@ RUN apt-get update &&\
         xsl \
         zip \
         gd \
+        soap \
     && \
     apt-get purge -y \
         icu-devtools libbsd-dev libbz2-dev libedit-dev libfreetype6-dev \
