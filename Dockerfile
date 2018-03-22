@@ -123,6 +123,7 @@ RUN apt-get update && \
 	rm -r /var/lib/apt/lists/*
 
 # Cache composer downloads in a volume
+RUN mkdir /var/www/.composer; chown www-data /var/www/.composer
 VOLUME /var/www/.composer
 
 # Script to wait for db
