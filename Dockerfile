@@ -94,7 +94,7 @@ RUN groupadd -r -g 109 fcron && \
     apt-get purge -y wget vim && \
     apt-get autoremove -y && \
     apt-get clean && \
-    rm -Rf fcron-3.3.0*z && \
+    rm -Rf fcron-3.3.0* && \
     rm -rf /var/lib/apt/lists/
 ADD fcron.conf /usr/local/etc
 ADD echomail /usr/local/bin
