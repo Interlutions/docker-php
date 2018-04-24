@@ -6,7 +6,7 @@ RUN apt-get update &&\
         icu-devtools libbsd-dev libbz2-dev libedit-dev libfreetype6 libfreetype6-dev \
         libicu-dev libicu52 libjpeg62-turbo libjpeg62-turbo-dev libmcrypt-dev \
         libmcrypt4 libpng12-0 libpng12-dev libsqlite3-dev libtinfo-dev libxml2-dev \
-        libxslt1-dev libxslt1.1 zlib1g-dev \
+        libxslt1-dev libxslt1.1 zlib1g-dev libjpeg-turbo-progs optipng \
     && \
     rm -r /var/lib/apt/lists/* && \
     docker-php-ext-configure gd \
