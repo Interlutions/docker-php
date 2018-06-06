@@ -6,12 +6,23 @@ set -e
 USERNAME="www-data"
 GROUPNAME=${USERNAME}
 
-# Change uid of the user.
-if [ `id -u ${USERNAME}` != ${UID} ]; then
-	usermod -u ${UID} ${USERNAME}
+# Change UID of the user, when env var UID is provided
+if [ ! -z ${UID} ]; then
+    OLDUID=`id -u ${USERNAME}`
+    if [ ${OLDUID} != ${UID} ]; then
+        usermod -u ${UID} ${USERNAME}
+        # Also change permissions on all existing files
+        find / -xdev -user ${OLDUID} -exec chown ${UID} {} +
+    fi
 fi
-if [ `id -g ${GROUPNAME}` != ${GID} ]; then
-	groupmod -g ${GID} ${GROUPNAME}
+
+# Change GID of the user, when env var GID is provided
+if [ ! -z ${GID} ]; then
+    OLDGID=`id -g ${GROUPNAME}`
+    if [ ${OLDGID} != ${GID} ]; then
+        groupmod -g ${GID} ${GROUPNAME}
+        find / -xdev -group ${OLDGID} -exec chgrp ${GID} {} +
+    fi
 fi
 
 # Call parent entrypoint (as other user) when needed
