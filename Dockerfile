@@ -26,7 +26,6 @@ RUN apt-get update &&\
         intl \
         opcache \
         pcntl \
-        pdo \
         pdo_mysql \
         pdo_sqlite \
         readline \
