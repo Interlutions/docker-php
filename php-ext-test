@@ -1,0 +1,16 @@
+#!/bin/sh
+
+is_error=false
+
+for ext in $@; do
+    if [ `php -m | grep "${ext}" | wc -l` -gt 0 ]; then
+        echo "${ext} is installed"
+    else
+        echo "${ext} is not installed"
+        is_error=true
+    fi
+done
+
+if [ $is_error = true ]; then
+    exit 1
+fi

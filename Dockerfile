@@ -4,8 +4,8 @@ FROM php:7.0-fpm
 RUN apt-get update &&\
     apt-get install -y --no-install-recommends \
         icu-devtools libbsd-dev libbz2-dev libedit-dev libfreetype6 libfreetype6-dev \
-        libicu-dev libicu52 libjpeg62-turbo libjpeg62-turbo-dev libmcrypt-dev \
-        libmcrypt4 libpng12-0 libpng12-dev libsqlite3-dev libtinfo-dev libxml2-dev \
+        libicu-dev libicu57 libjpeg62-turbo libjpeg62-turbo-dev libmcrypt-dev \
+        libmcrypt4 libpng16-16 libpng-dev libsqlite3-dev libtinfo-dev libxml2-dev \
         libxslt1-dev libxslt1.1 zlib1g-dev libjpeg-turbo-progs optipng \
     && \
     rm -r /var/lib/apt/lists/* && \
@@ -16,22 +16,13 @@ RUN apt-get update &&\
     && \
     docker-php-ext-install -j$(nproc) \
         bcmath \
-	bz2 \
-        dom \
+	    bz2 \
         exif \
-        fileinfo \
-        hash \
-        iconv \
         mcrypt \
         intl \
         opcache \
         pcntl \
         pdo_mysql \
-        pdo_sqlite \
-        readline \
-        session \
-        simplexml \
-        xml \
         xsl \
         zip \
         gd \
@@ -114,6 +105,10 @@ RUN docker-php-source extract && \
     docker-php-source delete
 COPY xdebug.sh /
 RUN mv /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini.bak
+
+COPY php-ext-test /usr/local/bin
+RUN php-ext-test pdo pdo_mysql session iconv fileinfo exif readline hash SimpleXML xml bz2 dom bcmath sqlite3 apcu \
+    mcrypt mbstring json libxml curl
 
 # Tools to change the uid on run
 RUN apt-get update && \
