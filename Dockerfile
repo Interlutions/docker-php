@@ -22,9 +22,9 @@ RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS && \
     rm -r /tmp/*
 
 # Install Imagemagick
-RUN apk add --no-cache imagemagick-dev libtool autoconf gcc g++ make \
-    && pecl install imagick-3.4.3 \
-    && echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini \
+RUN apk add --no-cache imagemagick-dev imagemagick libtool autoconf gcc g++ make  \
+    && pecl install imagick \
+    && docker-php-ext-enable imagick \
     && apk del libtool autoconf gcc g++ make
 
 # download composer in the latest stable release
