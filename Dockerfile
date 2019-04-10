@@ -1,10 +1,10 @@
-FROM php:7.2-fpm-alpine
+FROM php:7.3-fpm-alpine
 
 # Install PHP extensions
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS && \
     apk add --no-cache --virtual .gd-runtime-deps freetype libpng libjpeg-turbo && \
     apk add --no-cache --virtual .gd-build-deps freetype-dev libpng-dev libjpeg-turbo-dev && \
-    apk add --no-cache --virtual .ext-runtime-deps libbz2 libmcrypt libxslt icu && \
+    apk add --no-cache --virtual .ext-runtime-deps libbz2 libmcrypt libxslt icu libzip-dev && \
     apk add --no-cache --virtual .ext-build-deps bzip2-dev libmcrypt-dev libxml2-dev libedit-dev libxslt-dev icu-dev sqlite-dev && \
     docker-php-ext-configure gd \
       --with-freetype-dir=/usr/include/ \
@@ -21,6 +21,12 @@ RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS && \
     apk del .ext-build-deps && \
     rm -r /tmp/*
 
+# Install Imagemagick
+RUN apk add --no-cache imagemagick-dev imagemagick libtool autoconf gcc g++ make  \
+    && pecl install imagick \
+    && docker-php-ext-enable imagick \
+    && apk del libtool autoconf gcc g++ make
+
 # download composerin the latest stable release
 RUN curl -o composer-installer.php https://getcomposer.org/installer && \
     php composer-installer.php --quiet --install-dir="/usr/local/bin" && \
@@ -32,6 +38,9 @@ RUN apk add --no-cache git openssh-client rsync
 
 # Install mysql client (for data-transfer operations)
 RUN apk add --no-cache mysql-client
+
+# Install PHP extension mysqli
+RUN docker-php-ext-install mysqli
 
 # Install timezone change utils
 RUN apk add --no-cache tzdata
