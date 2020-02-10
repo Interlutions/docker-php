@@ -1,24 +1,31 @@
 FROM php:7.4-fpm-alpine
 
 # Install PHP extensions
-RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS && \
-    apk add --no-cache --virtual .gd-runtime-deps freetype libpng libjpeg-turbo && \
-    apk add --no-cache --virtual .gd-build-deps freetype-dev libpng-dev libjpeg-turbo-dev && \
-    apk add --no-cache --virtual .ext-runtime-deps libbz2 libmcrypt libxslt icu libzip-dev && \
-    apk add --no-cache --virtual .ext-build-deps bzip2-dev libmcrypt-dev libxml2-dev libedit-dev libxslt-dev icu-dev sqlite-dev && \
-    docker-php-ext-configure gd \
-      --with-freetype=/usr/include/ \
-      --with-jpeg=/usr/include/ && \
-    NPROC=$(getconf _NPROCESSORS_ONLN) && \
-    docker-php-ext-install -j${NPROC} bz2 dom exif fileinfo hash iconv intl opcache pcntl pdo pdo_mysql pdo_sqlite readline session simplexml xml xsl zip gd && \
-    pecl install xdebug && \
-    docker-php-ext-enable xdebug && \
-    pecl install apcu && \
-    docker-php-ext-enable apcu && \
-    apk del .gd-build-deps && \
-    apk del .build-deps && \
-    apk del .ext-build-deps && \
-    rm -r /tmp/*
+RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS
+RUN apk add --no-cache --virtual .gd-runtime-deps freetype libpng libjpeg-turbo
+RUN apk add --no-cache --virtual .gd-build-deps freetype-dev libpng-dev libjpeg-turbo-dev
+RUN apk add --no-cache --virtual .ext-runtime-deps libbz2 libmcrypt libxslt icu libzip-dev
+RUN apk add --no-cache --virtual .ext-build-deps bzip2-dev libmcrypt-dev libxml2-dev libedit-dev libxslt-dev icu-dev sqlite-dev
+
+# Configure GD
+RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/
+
+# Install PHP Modules
+RUN docker-php-ext-install bz2 dom exif fileinfo iconv intl opcache pcntl pdo pdo_mysql pdo_sqlite readline session simplexml xml xsl zip gd
+
+# Install and enable xdebug
+RUN pecl install xdebug
+RUN docker-php-ext-enable xdebug
+
+# Install and enavle apcu
+RUN pecl install apcu
+RUN docker-php-ext-enable apcu
+
+# Remove virtual packages
+RUN apk del .build-deps
+RUN apk del .gd-build-deps
+RUN apk del .ext-build-deps
+RUN rm -r /tmp/*
 
 # Install Imagemagick
 RUN apk add --no-cache imagemagick-dev imagemagick libtool autoconf gcc g++ make  \
