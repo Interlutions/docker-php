@@ -7,9 +7,9 @@ RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS && \
     apk add --no-cache --virtual .ext-runtime-deps libbz2 libmcrypt libxslt icu libzip-dev && \
     apk add --no-cache --virtual .ext-build-deps bzip2-dev libmcrypt-dev libxml2-dev libedit-dev libxslt-dev icu-dev sqlite-dev && \
     docker-php-ext-configure gd \
-      --with-freetype-dir=/usr/include/ \
-      --with-png-dir=/usr/include/ \
-      --with-jpeg-dir=/usr/include/ && \
+      --with-freetype=/usr/include/ \
+      --with-png=/usr/include/ \
+      --with-jpeg=/usr/include/ && \
     NPROC=$(getconf _NPROCESSORS_ONLN) && \
     docker-php-ext-install -j${NPROC} bz2 dom exif fileinfo hash iconv intl opcache pcntl pdo pdo_mysql pdo_sqlite readline session simplexml xml xsl zip gd && \
     pecl install xdebug && \
