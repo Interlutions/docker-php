@@ -1,4 +1,4 @@
-# PHP 7.3 fpm alpine for php projects
+# PHP 7.4 fpm alpine for php projects
 
 This image features
 * Useful PHP extensions
