@@ -11,7 +11,7 @@ RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS && \
       --with-png-dir=/usr/include/ \
       --with-jpeg-dir=/usr/include/ && \
     NPROC=$(getconf _NPROCESSORS_ONLN) && \
-    docker-php-ext-install -j${NPROC} bz2 dom exif fileinfo hash iconv intl opcache pcntl pdo pdo_mysql pdo_sqlite readline session simplexml xml xsl zip gd && \
+    docker-php-ext-install -j${NPROC} bz2 bcmath dom exif fileinfo hash iconv intl opcache pcntl pdo pdo_mysql pdo_sqlite readline session simplexml xml xsl zip gd && \
     pecl install xdebug && \
     docker-php-ext-enable xdebug && \
     pecl install apcu && \
