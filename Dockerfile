@@ -1,22 +1,30 @@
 FROM php:7.2-fpm-alpine
 
 # Install PHP extensions
-RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS && \
-    apk add --no-cache --virtual .gd-runtime-deps freetype libpng libjpeg-turbo && \
-    apk add --no-cache --virtual .gd-build-deps freetype-dev libpng-dev libjpeg-turbo-dev && \
-    apk add --no-cache --virtual .ext-runtime-deps libbz2 libmcrypt libxslt icu && \
-    apk add --no-cache --virtual .ext-build-deps bzip2-dev libmcrypt-dev libxml2-dev libedit-dev libxslt-dev icu-dev sqlite-dev && \
-    docker-php-ext-configure gd \
+RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS
+
+RUN apk add --no-cache --virtual .gd-runtime-deps freetype libpng libjpeg-turbo
+
+RUN apk add --no-cache --virtual .gd-build-deps freetype-dev libpng-dev libjpeg-turbo-dev
+
+RUN apk add --no-cache --virtual .ext-runtime-deps libbz2 libmcrypt libxslt icu imagemagick imagemagick-libs imagemagick-dev
+
+RUN apk add --no-cache --virtual .ext-build-deps bzip2-dev libmcrypt-dev libxml2-dev libedit-dev libxslt-dev icu-dev sqlite-dev
+
+RUN docker-php-ext-configure gd \
       --with-freetype-dir=/usr/include/ \
       --with-png-dir=/usr/include/ \
       --with-jpeg-dir=/usr/include/ && \
-    NPROC=$(getconf _NPROCESSORS_ONLN) && \
-    docker-php-ext-install -j${NPROC} bz2 bcmath dom exif fileinfo hash iconv intl opcache pcntl pdo pdo_mysql pdo_sqlite readline session simplexml xml xsl zip gd && \
-    pecl install xdebug && \
+    NPROC=$(getconf _NPROCESSORS_ONLN)
+
+RUN docker-php-ext-install bz2 bcmath dom exif fileinfo hash iconv intl opcache pcntl pdo pdo_mysql pdo_sqlite readline session simplexml xml xsl zip gd
+
+RUN pecl install xdebug imagick apcu && \
     docker-php-ext-enable xdebug && \
-    pecl install apcu && \
-    docker-php-ext-enable apcu && \
-    apk del .gd-build-deps && \
+    docker-php-ext-enable imagick && \
+    docker-php-ext-enable apcu
+
+RUN apk del .gd-build-deps && \
     apk del .build-deps && \
     apk del .ext-build-deps && \
     rm -r /tmp/*
@@ -67,6 +75,7 @@ COPY ./docker-base.ini /usr/local/etc/php/conf.d/
 # Disable xdebug by default and add a script to reactivate
 # Just add a COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini.bak in your project
 COPY xdebug.sh /
+
 RUN mv /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini.bak
 
 # Cache composer downloads in a volume
@@ -77,5 +86,7 @@ COPY wait-for /usr/local/bin
 
 COPY entrypoint-cron /usr/local/bin
 COPY entrypoint-chuid /usr/local/bin
+
 ENTRYPOINT ["entrypoint-chuid"]
+
 CMD ["php-fpm"]
