@@ -35,6 +35,9 @@ RUN curl -o composer-installer.php https://getcomposer.org/installer && \
     ln -s /usr/local/bin/composer.phar /usr/local/bin/composer && \
     rm composer-installer.php
 
+# Install bash (for deploy scripts)
+RUN apk add --no-cache bash
+
 # Install git+ssh (for composer install)
 RUN apk add --no-cache git openssh-client rsync
 
